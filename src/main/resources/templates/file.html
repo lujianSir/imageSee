@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta charset="UTF-8" />
+<title>Insert title here</title>
+</head>
+<body>
+    <h1 th:inlines="text">文件上传</h1>
+    <form action="getColumn" method="post" enctype="multipart/form-data">
+        <p>选择文件: <input type="file" name="file"/></p>
+    <!--     <p>web/model: <input type="text" name="role"/></p>
+        <p>上传文件夹: <input type="text" name="catalog"/></p> -->
+        <p><input type="submit" value="上传"/></p>
+    </form>
+    
+    
+   	<form action="download" method="post" enctype="multipart/form-data">   	
+   		<input type="submit" value="下载"/>
+   	</form>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>	
+	<div id="canvasParcel" style="text-align: center;">
+		<div>
+			<canvas id="canvas" width="800px" height="300px" style="border: 1px dashed #ccc;"></canvas>
+		</div>
+		<button onclick="exportSignature(this)">确定</button>
+		<button onclick="empty(this)">清空</button>
+	</div>	
+<script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript">
+	var canvaDom = document.getElementById("canvas");   // 画布对象
+	var context = canvaDom.getContext("2d");            // 画板的上下文
+	var canvasX = canvaDom.getBoundingClientRect().left;// 画板的坐标x
+	var canvasY = canvaDom.getBoundingClientRect().top; // 画板的坐标y
+	context.fillStyle = "rgba(255, 255, 255, 0)";       // 画布背景色
+	// context.lineWidth = 1;                              // 线的宽度
+	// context.strokeStyle = "#000";                      // 线的颜色
+	context.fillRect(0, 0, canvaDom.width, canvaDom.height);// 画板的范围
+ 
+ 
+	canvaDom.addEventListener("mousedown", down, false);// 鼠标按下去的事件
+	canvaDom.addEventListener("mousemove", draw, false);// 鼠标移动事件
+	canvaDom.addEventListener("mouseup", up, false);    // 鼠标松开事件
+ 
+ 
+	var onoff = false;  // 锁定开关
+	var oldx = canvasX; // 起始坐标x
+	var oldy = canvasY; // 起始坐标y
+	var newx;           // 结束坐标x
+	var newy;           // 结束坐标y
+ 
+ 
+	// 鼠标按下
+	function down(event) {
+		onoff = true;                   // 打开开关
+		oldx = event.clientX -canvasX;  // 鼠标在画板中点击的X的坐标
+		oldy = event.clientY -canvasY;  // 鼠标在画板中点击的Y的坐标
+		context.beginPath();            // 开始路径
+	}
+ 
+ 
+	// 鼠标移动
+	function draw(event) {
+		// 开关
+		if (onoff) {
+			newx = event.clientX-canvasX;
+			newy = event.clientY-canvasY;
+			context.moveTo(oldx, oldy); // 线的起点坐标
+			context.lineTo(newx, newy); // 线的始点坐标
+			context.stroke();           // 初始化到画布中
+			oldx = newx;
+			oldy = newy;
+		}
+	}
+	// 鼠标离开
+	function up() {
+		onoff = false;      // 关闭开关
+		context.closePath();// 关闭路径
+	}
+ 
+ 
+	// 清空
+	function empty() {
+		context.clearRect(0,0,canvaDom.width,canvaDom.height);  // 清空的范围
+		context.fillRect(0, 0, canvaDom.width, canvaDom.height);// 重设的范围
+	}
+ 
+ 
+	//导出信息
+	function exportSignature() {
+ 
+		var blank = document.createElement('canvas');
+		blank.width = canvas.width;
+		blank.height = canvas.height;
+ 
+		if(canvas.toDataURL() == blank.toDataURL()){
+			alert('请签名');
+			return;
+		}
+ 
+		var exportImg = canvas.toDataURL("image/png");
+ 
+		var dlLink = document.createElement('a');
+		dlLink.download = 'signature';
+		dlLink.href = exportImg;
+		dlLink.dataset.downloadurl = ['image/png', dlLink.download, dlLink.href].join(':');
+ 
+		document.body.appendChild(dlLink);
+		dlLink.click();
+		document.body.removeChild(dlLink);
+		console.info(exportImg);
+	}
+
+	</script>
+</body>
+</html>
