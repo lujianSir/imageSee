@@ -2,7 +2,10 @@ package com.item.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,7 +18,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.baidu.aip.imagesearch.AipImageSearch;
 import com.item.entity.Height;
 import com.item.entity.Similar;
-import com.item.image.easydl.EasyBuilding;
 import com.item.image.easydl.EasyDL;
 import com.item.search.ImageSearchObject;
 import com.item.search.ImageSearchUtil;
@@ -55,9 +57,9 @@ public class ImageController {
 		// String path1 = "D:/image/xuexiao/a3.png";
 		String path1 = uploadFile(file);
 		String accesstoken = imageService.getAccessToken();
-		String total = EasyDL.easydlObjectDetection(path1, accesstoken);
+		String total = EasyDL.easydlZhuZiDetection(path1, accesstoken);
 		String num = imageNumber(total);
-		return "已施工的柱子个数：" + num + "个";
+		return num;
 	}
 
 	/**
@@ -74,9 +76,26 @@ public class ImageController {
 		String str = ImageSearchUtil.sample(client, image);
 		String path = imageSimilar(str);
 		String accesstoken = imageService.getAccessToken();
-		String building = EasyBuilding.easydlObjectDetection(path, accesstoken);
+		String building = EasyDL.easydlHeightDetection(path, accesstoken);
 		String height = imageHeight(building);
 		return "已施工层高：" + height + "层";
+	}
+
+	/**
+	 * 墩面的个数
+	 * 
+	 * @param file
+	 * @return
+	 */
+	@RequestMapping("/getPierMumber")
+	@ResponseBody
+	public Map<String, Integer> getPierMumber(@RequestParam("file") MultipartFile file) {
+		// String path1 = "D:/image/xuexiao/a3.png";
+		String path = uploadFile(file);
+		String accesstoken = imageService.getAccessToken();
+		String total = EasyDL.easydDunMianDetection(path, accesstoken);
+		Map<String, Integer> map = imagePier(total);
+		return map;
 	}
 
 	/**
@@ -145,6 +164,31 @@ public class ImageController {
 		String r = jsonObject.getString("results");
 		List<Height> list = JSONObject.parseArray(r, Height.class);
 		return list.size() + "";
+	}
+
+	/**
+	 * 获取墩面个数
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public Map<String, Integer> imagePier(String str) {
+		JSONObject jsonObject = JSONObject.parseObject(str);
+		String r = jsonObject.getString("results");
+		List<Height> list = JSONObject.parseArray(r, Height.class);
+		List<Height> zhuzis = new ArrayList<Height>();
+		List<Height> dunmians = new ArrayList<Height>();
+		for (Height height : list) {
+			if (height.getName().equals("zhuzi")) {
+				zhuzis.add(height);
+			} else if (height.getName().equals("louban")) {
+				dunmians.add(height);
+			}
+		}
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		map.put("zhuzi", zhuzis.size());
+		map.put("loumian", dunmians.size());
+		return map;
 	}
 
 }

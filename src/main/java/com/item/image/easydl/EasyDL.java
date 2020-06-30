@@ -22,7 +22,9 @@ public class EasyDL {
 	public static final String APP_ID = "20207447";
 	public static final String API_KEY = "05F0SL3jAO2N2frG3gWYgHXa";
 	public static final String SECRET_KEY = "laIEWrbrrumyoY5SOZhKi9EjaU8oF89b";
-	public static final String URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/segmentation/hengxiang";
+	public static final String ZHUZIURL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/segmentation/hengxiang";
+	public static final String HEIGHTURL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/detection/louceng";
+	public static final String DUNMIANURL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/detection/louban";
 
 	/**
 	 * 获取认证
@@ -94,14 +96,63 @@ public class EasyDL {
 		return null;
 	}
 
-	public static String easydlObjectDetection(String path, String accessToken) {
+	// 柱子识别
+	public static String easydlZhuZiDetection(String path, String accessToken) {
 		// 请求url
-		String url = URL;
+		String url = ZHUZIURL;
 		String base64 = Base64Convert.GetImageStr(path);
 		try {
 			Map<String, Object> map = new HashMap<>();
 			map.put("image", base64);
 			map.put("threshold", 0.6);
+			String param = GsonUtils.toJson(map);
+
+			// 注意这里仅为了简化编码每一次请求都去获取access_token，线上环境access_token有过期时间， 客户端可自行缓存，过期后重新获取。
+			// String accessToken = "[调用鉴权接口获取的token]";
+
+			TrustHttp.trustEveryone();
+			String result = HttpUtil.post(url, accessToken, "application/json", param);
+			System.out.println(result);
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	// 楼层高度识别
+	public static String easydlHeightDetection(String path, String accessToken) {
+		// 请求url
+		String url = HEIGHTURL;
+		String base64 = Base64Convert.GetImageStr(path);
+		try {
+			Map<String, Object> map = new HashMap<>();
+			map.put("image", base64);
+			map.put("threshold", 0.8);
+			String param = GsonUtils.toJson(map);
+
+			// 注意这里仅为了简化编码每一次请求都去获取access_token，线上环境access_token有过期时间， 客户端可自行缓存，过期后重新获取。
+			// String accessToken = "[调用鉴权接口获取的token]";
+
+			TrustHttp.trustEveryone();
+			String result = HttpUtil.post(url, accessToken, "application/json", param);
+			System.out.println(result);
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	// 获取墩面的个数
+	public static String easydDunMianDetection(String path, String accessToken) {
+		// 请求url
+		String url = DUNMIANURL;
+		String base64 = Base64Convert.GetImageStr(path);
+		try {
+			Map<String, Object> map = new HashMap<>();
+			map.put("image", base64);
+			map.put("threshold", 0.3);
 			String param = GsonUtils.toJson(map);
 
 			// 注意这里仅为了简化编码每一次请求都去获取access_token，线上环境access_token有过期时间， 客户端可自行缓存，过期后重新获取。
